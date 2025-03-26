@@ -1,21 +1,25 @@
+// routes/books.js
 const express = require('express');
+const router = express.Router();
+const Book = require('../models/Book'); // Sesuaikan path dengan struktur proyek Anda
 
-const booksController = require('./books-controller');
+router.get('/', async (req, res) => {
+  let { offset = 0, limit = 10 } = req.query;
 
-const route = express.Router();
+  // Konversi ke integer
+  offset = parseInt(offset);
+  limit = parseInt(limit);
 
-module.exports = (app) => {
-  app.use('/books', route);
+  try {
+    const books = await Book.findAll({
+      offset: offset,
+      limit: limit,
+    });
 
-  // Get list of books
-  route.get('/', booksController.getBooks);
+    res.status(200).json(books);
+  } catch (error) {
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+  }
+});
 
-  // Create a new book
-  route.post('/', booksController.createBook);
-
-  // TODO: Get a book by id
-
-  // TODO: Update a book by id
-
-  // TODO: Delete a book by id
-};
+module.exports = router;
